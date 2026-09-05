@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "matrix-js-sdk": "npm:matrix-js-sdk@^42.3.0"
+  }
+}

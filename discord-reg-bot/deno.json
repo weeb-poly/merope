@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@discordjs/core": "npm:@discordjs/core@^2.6.0",
+    "zod": "jsr:@zod/zod@^4.5.4",
+    "discord.js": "npm:discord.js@^14.27.0"
+  }
+}
