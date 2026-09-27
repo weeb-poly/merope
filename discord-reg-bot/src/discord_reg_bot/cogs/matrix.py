@@ -73,6 +73,8 @@ class MatrixCog(commands.Cog):
             cur = self.db.execute("SELECT matrix FROM users WHERE discord = ?", (discord,))
             user_id = cur.fetchone()
             cur.close()
+        if user_id:
+            user_id, = user_id
         return user_id
 
     async def set_matrix_user(self, discord: int, matrix: str):
