@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import os
 import random
 import string
 
@@ -14,14 +13,14 @@ RANDOM_USER_ID_LENGTH = 10
 # https://github.com/matrix-construct/tuwunel/blob/5ff48622a03f6dcf110a59c8369611375b649037/src/admin/user/mod.rs#L35
 AUTO_GEN_PASSWORD_LENGTH = 25
 
-class Matrix(commands.Cog):
-    def __init__(self, bot: Bot):
+class MatrixCog(commands.Cog):
+    def __init__(self, bot: Bot, key: bytes, server: str):
         self.bot = bot
-        self.key = os.environ.get("MATRIX_REG_SHARED_SECRET", "").encode()
-        self.matrix_server = "https://matrix.wpi.moe/" # TODO
+        self.key = key
+        self.server = server
 
     async def cog_load(self):
-        self.session = aiohttp.ClientSession(self.matrix_server)
+        self.session = aiohttp.ClientSession(self.server)
 
     async def cog_unload(self):
         await self.session.close()
@@ -49,12 +48,14 @@ class Matrix(commands.Cog):
         await ctx.send(f'Created User `{username}` with password ||`{password}`||')
 
     async def get_matrix_user(self, member: discord.User | discord.Member) -> str | None:
-        # TODO: get matrix user if exists. This may require a database
+        db_cog  = self.bot.get_cog("DbCog")
+        # TODO: get matrix user if exists
         return None
 
     async def set_matrix_user(self, member: discord.User | discord.Member, username: str):
+        db_cog  = self.bot.get_cog("DbCog")
         # TODO: set matrix user in database
-        return None
+        pass
 
     @staticmethod
     def generate_alphanumeric_string(length: int):
@@ -116,8 +117,3 @@ class Matrix(commands.Cog):
             mac.update(user_type.encode('utf8'))
 
         return mac.hexdigest()
-
-
-async def setup(bot: Bot):
-    cog = Matrix(bot)
-    await bot.add_cog(cog)
