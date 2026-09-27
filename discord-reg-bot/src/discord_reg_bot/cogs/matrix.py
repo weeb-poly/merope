@@ -70,7 +70,7 @@ class MatrixCog(commands.Cog):
     async def get_matrix_user(self, discord: int) -> str | None:
         with self.db:
             cur = self.db.execute(
-                "SELECT matrix FROM users WHERE discord = ? AND matrix LIKE ':wpi.moe'",
+                "SELECT matrix FROM users WHERE discord = ? AND matrix LIKE '%:wpi.moe'",
                 (discord,)
             )
             user_id = cur.fetchone()
