@@ -69,8 +69,10 @@ class MatrixCog(commands.Cog):
 
     async def get_matrix_user(self, discord: int) -> str | None:
         with self.db:
-            # TODO: add check for ":wpi.moe" suffix
-            cur = self.db.execute("SELECT matrix FROM users WHERE discord = ?", (discord,))
+            cur = self.db.execute(
+                "SELECT matrix FROM users WHERE discord = ? AND matrix LIKE ':wpi.moe'",
+                (discord,)
+            )
             user_id = cur.fetchone()
             cur.close()
         if user_id:
