@@ -12,7 +12,7 @@ export async function getMatrixCreds(): Promise<{
   const CREDENTIALS_DIRECTORY = process.env["CREDENTIALS_DIRECTORY"] || process.cwd();
   const credDirUrl = CREDENTIALS_DIRECTORY ? pathToFileURL(CREDENTIALS_DIRECTORY) : null;
 
-  const userId = process.env["MATRIX_USER"];
+  const userId = (process.env["MATRIX_USER"] || "").replace(/^@/,"");
   assert(userId);
 
   const [ user, _homeserver ] = userId.split(":", 2);
