@@ -43,7 +43,7 @@ class MatrixCog(commands.Cog):
         user_id = await self.get_matrix_user(discord_user.id)
         if user_id is not None:
             logger.info(f"Discord User ({discord_user}) already has a Matrix User ({user_id})")
-            await ctx.reply("Matrix User already exists", ephemeral=True)
+            await ctx.reply(f"Matrix User `{user_id}` exists", ephemeral=True)
             return
 
         # TODO: use model
