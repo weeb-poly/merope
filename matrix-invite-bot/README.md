@@ -18,11 +18,11 @@ INVITE_ROOM={{Matrix Room ID}}
 ## Run
 
 ```
-deno run --env-file .\matrix-invite-bot\index.ts
+deno run --env-file ./matrix-invite-bot/index.ts
 ```
 
 ## Build
 
 ```
-deno compile -A --env=.env --target x86_64-unknown-linux-gnu --output matrix-bot-build .\matrix-bot\index.ts
+deno compile -A --env=.env --target x86_64-unknown-linux-gnu --output matrix-bot-build ./matrix-bot/index.ts
 ```
