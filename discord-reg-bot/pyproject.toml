@@ -9,6 +9,7 @@ dependencies = [
 
 [project.scripts]
 bot = "discord_reg_bot.__main__:main"
+setup_db = "discord_reg_bot.scripts.setup_db:main"
 
 [build-system]
 requires = ["uv_build>=0.12.19,<0.13"]

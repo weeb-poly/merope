@@ -1,10 +1,10 @@
 import hashlib
 import hmac
 import random
+import sqlite3
 import string
 
 import aiohttp
-import discord
 from discord.ext import commands
 from discord.ext.commands import Bot, Context
 
@@ -21,20 +21,24 @@ class MatrixCog(commands.Cog):
 
     async def cog_load(self):
         self.session = aiohttp.ClientSession(self.server)
+        self.db = sqlite3.connect("users.db")
 
     async def cog_unload(self):
         await self.session.close()
+        self.db.close()
 
     @commands.hybrid_group()
     async def matrix(self, ctx: Context):
         pass
 
-    @matrix.command()
+    @matrix.command(
+        description="Register Matrix Account"
+    )
     async def register(self, ctx: Context):
         member = ctx.author
-        username = await self.get_matrix_user(member)
+        username = await self.get_matrix_user(member.id)
         if username is not None:
-            await ctx.send("Matrix User already exists")
+            await ctx.reply("Matrix User already exists", ephemeral=True)
             return
 
         # TODO: use model
@@ -43,19 +47,32 @@ class MatrixCog(commands.Cog):
         displayname = member.display_name
 
         await self.create_user(username, password, displayname)
-        await self.set_matrix_user(member, username)
+        await self.set_matrix_user(member.id, username)
 
-        await ctx.send(f'Created User `{username}` with password ||`{password}`||')
+        await ctx.reply(
+            "\n".join((
+                f'Created User `{username}` with password ||`{password}`||.',
+                "Usernames are randomly generated and can't be changed.",
+                "You can change this password after you login.",
+                "Please Login at https://app.cinny.in/login/wpi.moe"
+            )),
+            ephemeral=True
+        )
 
-    async def get_matrix_user(self, member: discord.User | discord.Member) -> str | None:
-        db_cog  = self.bot.get_cog("DbCog")
-        # TODO: get matrix user if exists
-        return None
+    async def get_matrix_user(self, uid: int) -> str | None:
+        with self.db:
+            cur = self.db.execute("SELECT matrix FROM users WHERE discord = ?", (uid,))
+            username = cur.fetchone()
+            cur.close()
+        return username
 
-    async def set_matrix_user(self, member: discord.User | discord.Member, username: str):
-        db_cog  = self.bot.get_cog("DbCog")
-        # TODO: set matrix user in database
-        pass
+    async def set_matrix_user(self, uid: int, username: str):
+        with self.db:
+            cur = self.db.execute(
+                "INSERT INTO users(discord, matrix) VALUES(?, ?)",
+                (uid, username,)
+            )
+            cur.close()
 
     @staticmethod
     def generate_alphanumeric_string(length: int):
@@ -67,6 +84,7 @@ class MatrixCog(commands.Cog):
 
         # https://github.com/matrix-construct/tuwunel/blob/5ff48622a03f6dcf110a59c8369611375b649037/src/api/client/admin/get_nonce.rs
         async with self.session.get("/_synapse/admin/v1/register") as resp:
+            print(resp)
             nonce = (await resp.json())["nonce"]
 
         data = {
