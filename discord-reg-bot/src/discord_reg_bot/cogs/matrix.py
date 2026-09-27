@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import logging
 import random
 import sqlite3
 import string
@@ -12,6 +13,8 @@ from discord.ext.commands import Bot, Context
 RANDOM_USER_ID_LENGTH = 10
 # https://github.com/matrix-construct/tuwunel/blob/5ff48622a03f6dcf110a59c8369611375b649037/src/admin/user/mod.rs#L35
 AUTO_GEN_PASSWORD_LENGTH = 25
+
+logger = logging.getLogger(__name__)
 
 class MatrixCog(commands.Cog):
     def __init__(self, bot: Bot, key: bytes, server: str):
@@ -35,19 +38,24 @@ class MatrixCog(commands.Cog):
         description="Register Matrix Account"
     )
     async def register(self, ctx: Context):
-        member = ctx.author
-        username = await self.get_matrix_user(member.id)
-        if username is not None:
+        discord_user = ctx.author
+        logger.info(f"Checking if Discord User ({discord_user}) has Matrix Account")
+        user_id = await self.get_matrix_user(discord_user.id)
+        if user_id is not None:
+            logger.info(f"Discord User ({discord_user}) already has a Matrix User ({user_id})")
             await ctx.reply("Matrix User already exists", ephemeral=True)
             return
 
         # TODO: use model
         username = self.generate_alphanumeric_string(RANDOM_USER_ID_LENGTH)
         password = self.generate_alphanumeric_string(AUTO_GEN_PASSWORD_LENGTH)
-        displayname = member.display_name
+        displayname = discord_user.display_name
 
-        await self.create_user(username, password, displayname)
-        await self.set_matrix_user(member.id, username)
+        logger.info(f"Creating Matrix User ({username}) for Discord User ({discord_user})")
+
+        matrix_user = await self.create_user(username, password, displayname)
+        user_id = matrix_user["user_id"]
+        await self.set_matrix_user(discord_user.id, user_id)
 
         await ctx.reply(
             "\n".join((
@@ -59,18 +67,19 @@ class MatrixCog(commands.Cog):
             ephemeral=True
         )
 
-    async def get_matrix_user(self, uid: int) -> str | None:
+    async def get_matrix_user(self, discord: int) -> str | None:
         with self.db:
-            cur = self.db.execute("SELECT matrix FROM users WHERE discord = ?", (uid,))
-            username = cur.fetchone()
+            # TODO: add check for ":wpi.moe" suffix
+            cur = self.db.execute("SELECT matrix FROM users WHERE discord = ?", (discord,))
+            user_id = cur.fetchone()
             cur.close()
-        return username
+        return user_id
 
-    async def set_matrix_user(self, uid: int, username: str):
+    async def set_matrix_user(self, discord: int, matrix: str):
         with self.db:
             cur = self.db.execute(
                 "INSERT INTO users(discord, matrix) VALUES(?, ?)",
-                (uid, username,)
+                (discord, matrix,)
             )
             cur.close()
 
@@ -84,7 +93,7 @@ class MatrixCog(commands.Cog):
 
         # https://github.com/matrix-construct/tuwunel/blob/5ff48622a03f6dcf110a59c8369611375b649037/src/api/client/admin/get_nonce.rs
         async with self.session.get("/_synapse/admin/v1/register") as resp:
-            print(resp)
+            logger.debug(f"Getting Matrix Nonce: {resp}")
             nonce = (await resp.json())["nonce"]
 
         data = {
@@ -106,6 +115,7 @@ class MatrixCog(commands.Cog):
 
         # https://github.com/matrix-construct/tuwunel/blob/5ff48622a03f6dcf110a59c8369611375b649037/src/api/client/admin/register.rs
         async with self.session.post("/_synapse/admin/v1/register", json=data) as resp:
+            logger.debug(f"Registering Matrix User: {resp}")
             # TODO: validate response
             return await resp.json()
 

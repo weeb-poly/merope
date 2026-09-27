@@ -13,6 +13,6 @@ MATRIX_REG_SHARED_SECRET={{Tuwunel registration_shared_secret}}
 ## Run
 
 ```
-uv run --env-file .env --package discord-reg-bot setup_db
+uv run --package discord-reg-bot setup_db
 uv run --env-file .env --package discord-reg-bot bot
 ```
