@@ -1,8 +1,5 @@
 {
-  "workspace": ["./discord-reg-bot", "./matrix-invite-bot"],
-  "tasks": {
-    "dev": "deno run --watch --allow-net main.ts"
-  },
+  "workspace": ["./matrix-invite-bot"],
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.19"
   }

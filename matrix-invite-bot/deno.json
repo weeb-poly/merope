@@ -1,4 +1,7 @@
 {
+  "tasks": {
+    "dev": "deno run --watch --allow-net index.ts"
+  },
   "imports": {
     "matrix-js-sdk": "npm:matrix-js-sdk@^42.3.0"
   }
