@@ -1,7 +1,5 @@
-FROM denoland/deno:latest AS base
-
 # Build stage
-FROM base AS builder
+FROM ghcr.io/denoland/deno:debian AS builder
 
 WORKDIR /app
 
@@ -15,7 +13,7 @@ RUN --mount=type=cache,target=/deno-dir \
     deno bundle -o merope-matrix-bot.js ./merope-matrix-bot/index.ts
 
 # Production stage
-FROM base
+FROM ghcr.io/denoland/deno:distroless
 
 COPY --from=builder /app/merope-matrix-bot.js .
 
