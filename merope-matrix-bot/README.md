@@ -18,11 +18,18 @@ INVITE_ROOM={{Matrix Room ID}}
 ## Run
 
 ```
-deno run --env-file ./matrix-invite-bot/index.ts
+deno run --env-file ./merope-matrix-bot/index.ts
 ```
 
 ## Build
 
 ```
-deno compile -A --env=.env --target x86_64-unknown-linux-gnu --output matrix-bot-build ./matrix-bot/index.ts
+deno compile -A --env=.env --target x86_64-unknown-linux-gnu --output matrix-bot-build ./merope-matrix-bot/index.ts
+```
+
+## Podman
+
+```
+podman build -f merope-matrix-bot/Dockerfile -t merope-matrix-bot .
+podman run --rm --env-file .env merope-matrix-bot
 ```
