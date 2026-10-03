@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import logging
+import os
 import random
 import sqlite3
 import string
@@ -17,7 +18,17 @@ AUTO_GEN_PASSWORD_LENGTH = 25
 logger = logging.getLogger(__name__)
 
 class MatrixCog(commands.Cog):
-    def __init__(self, bot: Bot, key: bytes, server: str):
+    def __init__(
+        self,
+        bot: Bot,
+        key: bytes | None = None,
+        server: str | None = None
+    ):
+        if key is None:
+            key = os.environ.get("MATRIX_REG_SHARED_SECRET", "").encode()
+        if server is None:
+            server = os.environ.get("MATRIX_SERVER", "")
+
         self.bot = bot
         self.key = key
         self.server = server
