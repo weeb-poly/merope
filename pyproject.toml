@@ -1,5 +1,5 @@
 [tool.uv.sources]
-discord-reg-bot = { workspace = true }
+merope-discord-bot = { workspace = true }
 
 [tool.uv.workspace]
-members = ["discord-reg-bot"]
+members = ["merope-discord-bot"]

@@ -1,5 +1,5 @@
 {
-  "workspace": ["./matrix-invite-bot"],
+  "workspace": ["./merope-matrix-bot"],
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.19"
   }

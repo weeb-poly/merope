@@ -1,5 +1,5 @@
 [project]
-name = "discord-reg-bot"
+name = "merope-discord-bot"
 version = "0.0.0"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -8,8 +8,8 @@ dependencies = [
 ]
 
 [project.scripts]
-bot = "discord_reg_bot.__main__:main"
-setup_db = "discord_reg_bot.scripts.setup_db:main"
+merope-discord-bot = "merope_discord_bot.__main__:main"
+merope-discord-bot-setup-db = "merope_discord_bot.scripts.setup_db:main"
 
 [build-system]
 requires = ["uv_build>=0.12.19,<0.13"]
